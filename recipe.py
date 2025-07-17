@@ -32,10 +32,6 @@ Procedures: {procedures}
 Image URL: {image_location}
 """
 
-@mcp.tool()
-def generate_image():
-    """Generate an image with Pollinations!"""
-
 
 @mcp.tool()
 async def generate_pollinations_image(prompt: str) -> str:
