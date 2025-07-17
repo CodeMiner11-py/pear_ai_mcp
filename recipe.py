@@ -33,6 +33,39 @@ Image URL: {image_location}
 """
 
 @mcp.tool()
+def generate_image():
+    """Generate an image with Pollinations!"""
+
+
+@mcp.tool()
+async def generate_pollinations_image(prompt: str) -> str:
+    """Generate a Pollinations image from a text prompt, crop it, and retrieve the image."""
+    try:
+        async with httpx.AsyncClient() as client:
+            # Step 1: Generate image and get filename
+            pollinate_response = await client.post(
+                f"{api_url}/pollinate",
+                json={"prompt": prompt},
+                headers={"Content-Type": "application/json", "User-Agent": user_agent},
+                timeout=20.0
+            )
+            pollinate_response.raise_for_status()
+            filename = pollinate_response.text.replace("/images/", "")
+
+            # Step 2: Retrieve the image by filename
+            image_response = await client.get(
+                f"{api_url}/image_return",
+                params={"filename": filename},
+                headers={"User-Agent": user_agent},
+                timeout=20.0
+            )
+            image_response.raise_for_status()
+
+            return f"Image fetched successfully from /image_return with filename: {filename}"
+    except Exception as e:
+        return f"Image generation failed: {str(e)}"
+
+@mcp.tool()
 async def get_id_code() -> str:
     """Get an ID code. Not needed for general use, but can be used in debugging."""
     return await get_user_id()
